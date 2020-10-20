@@ -38,7 +38,7 @@ function App() {
                         <AppBar>
                             <Heading level='3' margin='none'>Awesome PokeDex!</Heading>
                         </AppBar>
-                        <Box direction='row' flex overflow={{horizontal: 'hidden'}} background="url(https://wallup.net/wp-content/uploads/2017/11/17/301412-Pokemon.jpg)">
+                        <Box direction='row' flex overflow={{horizontal: 'hidden'}} background="url(https://storage.googleapis.com/pokedexbucket/background.jpg)">
                             <Box flex align='center' justify='center'>
                                 <PokemonDashboard/>
                             </Box>

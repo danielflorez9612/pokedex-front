@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import ReactDOM from 'react-dom'
 import {Box, Button, Card, CardBody, CardHeader, Grid, Grommet, Heading, Image, Stack, Text, TextInput} from 'grommet';
 import PokemonService from "../services/PokemonService";
 import {FormNextLink, FormPreviousLink, Search} from "grommet-icons";
@@ -42,7 +43,7 @@ const PokemonDashboard = () => {
         pokemonList: [],
         currentOffset: 0,
         pokemonDetail: null,
-        limit:20
+        limit:100
     });
     const updateList = (offset, limit) => {
         pokemonService.getPokemonList(offset, limit)
@@ -61,18 +62,24 @@ const PokemonDashboard = () => {
         updateList(state.currentOffset-state.limit, state.limit)
     };
 
-    useEffect(()=>updateList(state.currentOffset,state.limit), [])
-    return <Grommet theme={theme} full>
-        <Box pad="medium">
-            <Box align="center" pad="large" gap='small'>
-                <Box direction="row" gap='medium'>
-                    <Button icon={<FormPreviousLink />} onClick={()=>prevPage()} disabled={state.currentOffset===0} primary/>
-                    <Button icon={<FormNextLink />} onClick={()=>nextPage()} disabled={state.pokemonList.length<state.limit} primary />
-                </Box>
+    const Controls = ({withOffsetSearch}) => {
+        return <Box align="center" pad={{vertical:'small'}} gap='small'>
+            <Box direction="row" gap='medium' pad={{vertical:'small'}}>
+                {withOffsetSearch &&
                 <Box width="medium" direction="row" gap="medium">
                     <TextInput icon={<Search />} onChange={event => updateList(event.target.value?event.target.value:0)} placeholder="offset" />
                 </Box>
+                }
+                <Button icon={<FormPreviousLink />} onClick={()=>prevPage()} disabled={state.currentOffset===0} primary/>
+                <Button icon={<FormNextLink />} onClick={()=>nextPage()} disabled={state.pokemonList.length<state.limit} primary />
             </Box>
+
+        </Box>
+    }
+    useEffect(()=>updateList(state.currentOffset,state.limit), [])
+    return <Grommet theme={theme} full>
+        <Box pad={{horizontal:'medium', vertical:'small'}}>
+            <Controls withOffsetSearch={true}/>
             {/* Responsive Grid */}
             <Grid gap="medium" rows="small" columns='small'>
                 {state.pokemonList.map(value => (
@@ -114,6 +121,7 @@ const PokemonDashboard = () => {
                     </Card>
                 ))}
             </Grid>
+            <Controls/>
         </Box>
     </Grommet>
 }

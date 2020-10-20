@@ -1,8 +1,6 @@
-import React from "react";
-
 const PokemonService = () => {
 
-    const getPokemonList = (offset = 0, limit = 12)=> {
+    const getPokemonList = (offset = 0, limit = 20)=> {
         return fetch(`/api/pokemon?offset=${offset}&limit=${limit}`)
             .then(response => response.json())
     }

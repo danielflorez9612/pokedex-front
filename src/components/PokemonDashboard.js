@@ -4,10 +4,10 @@ import PokemonService from "../services/PokemonService";
 
 const theme = {
     global: {
-        hover:{
-          background: {
-              opacity:'strong'
-          }
+        hover: {
+            background: {
+                opacity: 'strong'
+            }
         },
         font: {
             family: `-apple-system,
@@ -36,30 +36,41 @@ const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 const pokemonService = PokemonService();
-const PokemonDashboard = () => {
-    const [pokemonList, setPokemonList] = useState([]);
-    const [pokemonDetail, setPokemonDetail] = useState([]);
-    useEffect(() => {
-        pokemonService.getPokemonList()
-            .then(list => setPokemonList(list))
-    }, pokemonList)
+const PokemonDashboard = ({...rest}) => {
+    const [state, setState] = useState({
+        pokemonList: [],
+        currentOffset: 0,
+        pokemonDetail: null
+    });
+    const updateList = (offset, limit) => {
+        pokemonService.getPokemonList(offset, limit)
+            .then(list => {
+                setState(prevState => ({
+                    ...state,
+                    pokemonList: prevState.pokemonList.concat(list),
+                    currentOffset: parseInt(prevState.currentOffset) + parseInt(limit)
+                }))
+            })
+    };
+
+    useEffect(updateList, [])
     return <Grommet theme={theme} full>
         <Box pad="large">
             {/* Responsive Grid */}
             <Grid gap="medium" rows="small" columns={{count: 'fit', size: 'small'}}>
-                {pokemonList.map(value => (
+                {state.pokemonList.map(value => (
                     <Card
                         onClick={() => {
                             pokemonService.getPokemonByName(value.name)
-                                .then(pokemon=> setPokemonDetail(pokemon))
+                                .then(pokemon => setState({...state, pokemonDetail: pokemon}))
                         }}
                         hoverIndicator={true}
                         key={value.id}
                         background={pokemonService.getTypeColor(value.type)}
                     >
                         <Stack anchor="bottom-left"
-                            >
-                            <CardBody pad={{horizontal:'small', bottom:'large', top:'none'}} height='small'>
+                        >
+                            <CardBody pad={{horizontal: 'small', bottom: 'large', top: 'none'}} height='small'>
                                 <b>{value.id}</b>
                                 <Image
                                     fit="contain"

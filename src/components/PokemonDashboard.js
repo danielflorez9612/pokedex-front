@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Card, CardBody, CardHeader, Grid, Grommet, Heading, Image, Stack, Text} from 'grommet';
+import {Box, Button, Card, CardBody, CardHeader, Grid, Grommet, Heading, Image, Stack, Text, TextInput} from 'grommet';
 import PokemonService from "../services/PokemonService";
+import {FormNextLink, FormPreviousLink, Search} from "grommet-icons";
 
 const theme = {
     global: {
@@ -36,28 +37,44 @@ const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 const pokemonService = PokemonService();
-const PokemonDashboard = ({...rest}) => {
+const PokemonDashboard = () => {
     const [state, setState] = useState({
         pokemonList: [],
         currentOffset: 0,
-        pokemonDetail: null
+        pokemonDetail: null,
+        limit:20
     });
     const updateList = (offset, limit) => {
         pokemonService.getPokemonList(offset, limit)
             .then(list => {
-                setState(prevState => ({
+                setState({
                     ...state,
-                    pokemonList: prevState.pokemonList.concat(list),
-                    currentOffset: parseInt(prevState.currentOffset) + parseInt(limit)
-                }))
+                    pokemonList: list,
+                    currentOffset: offset
+                })
             })
     };
+    const nextPage = () => {
+        updateList(state.currentOffset+state.limit, state.limit)
+    };
+    const prevPage = () => {
+        updateList(state.currentOffset-state.limit, state.limit)
+    };
 
-    useEffect(updateList, [])
+    useEffect(()=>updateList(state.currentOffset,state.limit), [])
     return <Grommet theme={theme} full>
-        <Box pad="large">
+        <Box pad="medium">
+            <Box align="center" pad="large" gap='small'>
+                <Box direction="row" gap='medium'>
+                    <Button icon={<FormPreviousLink />} onClick={()=>prevPage()} disabled={state.currentOffset===0} primary/>
+                    <Button icon={<FormNextLink />} onClick={()=>nextPage()} disabled={state.pokemonList.length<state.limit} primary />
+                </Box>
+                <Box width="medium" direction="row" gap="medium">
+                    <TextInput icon={<Search />} onChange={event => updateList(event.target.value?event.target.value:0)} placeholder="offset" />
+                </Box>
+            </Box>
             {/* Responsive Grid */}
-            <Grid gap="medium" rows="small" columns={{count: 'fit', size: 'small'}}>
+            <Grid gap="medium" rows="small" columns='small'>
                 {state.pokemonList.map(value => (
                     <Card
                         onClick={() => {
@@ -75,7 +92,7 @@ const PokemonDashboard = ({...rest}) => {
                                 <Image
                                     fit="contain"
                                     a11yTitle="scuba diving"
-                                    src={value.image}
+                                    src={value.image?value.image:'https://elvortex.com/wp-content/uploads/2018/03/HddtBOT-1068x601.png'}
                                 />
                             </CardBody>
                             <CardHeader
@@ -90,7 +107,7 @@ const PokemonDashboard = ({...rest}) => {
                                     </Heading>
                                     <Text size="xsmall"><b>Weight: </b>{value.weight}</Text>
                                     <Text size="xsmall"><b>Type: </b>{value.type}</Text>
-                                    <Text size="xsmall"><b>Abilities: </b>{value.abilities.join(', ')}</Text>
+                                    <Text size="xsmall" wordBreak={"break-all"}><b>Abilities: </b>{value.abilities.join(', ')}</Text>
                                 </Box>
                             </CardHeader>
                         </Stack>

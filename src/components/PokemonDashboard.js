@@ -68,11 +68,13 @@ const PokemonDashboard = () => {
             <Stack anchor="bottom-left">
                 <CardBody pad={{horizontal: 'small', bottom: 'large', top: 'none'}} height='small'>
                     <Text margin={{top:"small"}} weight='bold' size='large'>{pokemon.id}</Text>
-                    <Image
-                        fit="contain"
-                        a11yTitle="Official Artwork"
-                        src={pokemon.image ? pokemon.image : whoIsThatPokemonImage}
-                    />
+                    <Box animation='fadeIn'>
+                        <Image
+                            fit="contain"
+                            a11yTitle="Official Artwork"
+                            src={pokemon.image ? pokemon.image : whoIsThatPokemonImage}
+                        />
+                    </Box>
                 </CardBody>
                 <CardHeader
                     pad={{horizontal: 'small', vertical: 'small'}}
@@ -183,7 +185,7 @@ const PokemonDashboard = () => {
             <GridControls/>
             {/* Responsive Grid */}
             <Grid gap="medium" rows="small" columns='small'>
-                {state.pokemonList.map(value => (<PokemonGridItem pokemon={value}/>))}
+                {state.pokemonList.map(value => (<PokemonGridItem key={value.id} pokemon={value}/>))}
             </Grid>
             <GridControls/>
         </Box>

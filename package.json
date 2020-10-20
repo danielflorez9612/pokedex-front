@@ -8,10 +8,13 @@
     "@testing-library/user-event": "^7.2.1",
     "grommet": "^2.15.2",
     "grommet-icons": "^4.5.0",
+    "morgan": "^1.10.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-scripts": "3.4.3",
-    "styled-components": "^5.2.0"
+    "rxjs": "^6.6.3",
+    "styled-components": "^5.2.0",
+    "use-subscribable": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -33,5 +36,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^1.0.6"
   }
 }

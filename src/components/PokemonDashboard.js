@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom'
-import {Box, Button, Card, CardBody, CardHeader, Grid, Grommet, Heading, Image, Stack, Text, TextInput} from 'grommet';
+import {Box, Button, Card, CardBody, CardHeader, Grid, Grommet, Heading, Image, Stack, Text} from 'grommet';
 import PokemonService from "../services/PokemonService";
-import {FormNextLink, FormPreviousLink, Search} from "grommet-icons";
+import {FormNextLink, FormPreviousLink} from "grommet-icons";
 
 const theme = {
     global: {
@@ -10,26 +9,6 @@ const theme = {
             background: {
                 opacity: 'strong'
             }
-        },
-        font: {
-            family: `-apple-system,
-         BlinkMacSystemFont, 
-         "Segoe UI"`,
-        },
-        colors: {
-            blue: '#00C8FF',
-            green: '#17EBA0',
-            teal: '#82FFF2',
-            purple: '#F740FF',
-            red: '#FC6161',
-            orange: '#FFBC44',
-            yellow: '#FFEB59',
-        },
-    },
-    card: {
-        footer: {
-            pad: {horizontal: 'medium', vertical: 'small'},
-            background: '#FFFFFF27',
         },
     },
 };
@@ -43,7 +22,7 @@ const PokemonDashboard = () => {
         pokemonList: [],
         currentOffset: 0,
         pokemonDetail: null,
-        limit:100
+        limit: 100
     });
     const updateList = (offset, limit) => {
         pokemonService.getPokemonList(offset, limit)
@@ -56,72 +35,72 @@ const PokemonDashboard = () => {
             })
     };
     const nextPage = () => {
-        updateList(state.currentOffset+state.limit, state.limit)
+        updateList(state.currentOffset + state.limit, state.limit)
     };
     const prevPage = () => {
-        updateList(state.currentOffset-state.limit, state.limit)
+        updateList(state.currentOffset - state.limit, state.limit)
     };
 
-    const Controls = ({withOffsetSearch}) => {
-        return <Box align="center" pad={{vertical:'small'}} gap='small'>
-            <Box direction="row" gap='medium' pad={{vertical:'small'}}>
-                {withOffsetSearch &&
-                <Box width="medium" direction="row" gap="medium">
-                    <TextInput icon={<Search />} onChange={event => updateList(event.target.value?event.target.value:0)} placeholder="offset" />
-                </Box>
-                }
-                <Button icon={<FormPreviousLink />} onClick={()=>prevPage()} disabled={state.currentOffset===0} primary/>
-                <Button icon={<FormNextLink />} onClick={()=>nextPage()} disabled={state.pokemonList.length<state.limit} primary />
+    const PokemonGridItem = ({pokemon}) => {
+        const whoIsThatPokemonImage = 'https://elvortex.com/wp-content/uploads/2018/03/HddtBOT-1068x601.png';
+        return <Card
+            onClick={() => {
+                pokemonService.getPokemonByName(pokemon.name)
+                    .then(pokemon => setState({...state, pokemonDetail: pokemon}))
+            }}
+            hoverIndicator={true}
+            key={pokemon.id}
+            background={pokemonService.getTypeColor(pokemon.type)}
+        >
+            <Stack anchor="bottom-left">
+                <CardBody pad={{horizontal: 'small', bottom: 'large', top: 'none'}} height='small'>
+                    <b>{pokemon.id}</b>
+                    <Image
+                        fit="contain"
+                        a11yTitle="Official Artwork"
+                        src={pokemon.image ? pokemon.image : whoIsThatPokemonImage}
+                    />
+                </CardBody>
+                <CardHeader
+                    pad={{horizontal: 'small', vertical: 'small'}}
+                    background={`${pokemonService.getTypeColor(pokemon.type)}80`}
+                    width="medium"
+                    justify="start"
+                >
+                    <Box>
+                        <Heading level='3' margin='none'>
+                            {capitalize(pokemon.name)}
+                        </Heading>
+                        <Text size="xsmall"><b>Weight: </b>{pokemon.weight}</Text>
+                        <Text size="xsmall"><b>Type: </b>{pokemon.type}</Text>
+                        <Text size="xsmall"
+                              wordBreak={"break-all"}><b>Abilities: </b>{pokemon.abilities.join(', ')}</Text>
+                    </Box>
+                </CardHeader>
+            </Stack>
+        </Card>
+    }
+
+    const GridControls = () => {
+        return <Box align="center" pad={{vertical: 'small'}} gap='small'>
+            <Box direction="row" gap='medium' pad={{vertical: 'small'}}>
+                <Button icon={<FormPreviousLink/>} onClick={() => prevPage()} disabled={state.currentOffset === 0}
+                        primary/>
+                <Button icon={<FormNextLink/>} onClick={() => nextPage()}
+                        disabled={state.pokemonList.length < state.limit} primary/>
             </Box>
 
         </Box>
     }
-    useEffect(()=>updateList(state.currentOffset,state.limit), [])
+    useEffect(() => updateList(state.currentOffset, state.limit), [])
     return <Grommet theme={theme} full>
-        <Box pad={{horizontal:'medium', vertical:'small'}}>
-            <Controls withOffsetSearch={true}/>
+        <Box pad={{horizontal: 'medium', vertical: 'small'}}>
+            <GridControls />
             {/* Responsive Grid */}
             <Grid gap="medium" rows="small" columns='small'>
-                {state.pokemonList.map(value => (
-                    <Card
-                        onClick={() => {
-                            pokemonService.getPokemonByName(value.name)
-                                .then(pokemon => setState({...state, pokemonDetail: pokemon}))
-                        }}
-                        hoverIndicator={true}
-                        key={value.id}
-                        background={pokemonService.getTypeColor(value.type)}
-                    >
-                        <Stack anchor="bottom-left"
-                        >
-                            <CardBody pad={{horizontal: 'small', bottom: 'large', top: 'none'}} height='small'>
-                                <b>{value.id}</b>
-                                <Image
-                                    fit="contain"
-                                    a11yTitle="scuba diving"
-                                    src={value.image?value.image:'https://elvortex.com/wp-content/uploads/2018/03/HddtBOT-1068x601.png'}
-                                />
-                            </CardBody>
-                            <CardHeader
-                                pad={{horizontal: 'small', vertical: 'small'}}
-                                background={`${pokemonService.getTypeColor(value.type)}80`}
-                                width="medium"
-                                justify="start"
-                            >
-                                <Box>
-                                    <Heading level='3' margin='none'>
-                                        {capitalize(value.name)}
-                                    </Heading>
-                                    <Text size="xsmall"><b>Weight: </b>{value.weight}</Text>
-                                    <Text size="xsmall"><b>Type: </b>{value.type}</Text>
-                                    <Text size="xsmall" wordBreak={"break-all"}><b>Abilities: </b>{value.abilities.join(', ')}</Text>
-                                </Box>
-                            </CardHeader>
-                        </Stack>
-                    </Card>
-                ))}
+                {state.pokemonList.map(value => (<PokemonGridItem pokemon={value}/>))}
             </Grid>
-            <Controls/>
+            <GridControls/>
         </Box>
     </Grommet>
 }
